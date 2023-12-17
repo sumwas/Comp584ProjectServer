@@ -22,8 +22,8 @@ namespace Comp584ProjectServer.Controllers
             this.bookRepository = bookRepository;
         }
 
-        //[Authorize(Roles = "RegisteredUser")]
         [HttpPost]
+        [Authorize(Roles = "Reader")]
         public async Task<IActionResult> CreateReview([FromBody] CreateReviewRequestDTO request)
         {
             var book = await bookRepository.GetById(request.BookId);
@@ -68,7 +68,6 @@ namespace Comp584ProjectServer.Controllers
             return Ok(response);
         }
 
-        //[Authorize(Roles = "RegisteredUser")]
         [HttpGet]
         public async Task<IActionResult> GetAllReviews()
         {

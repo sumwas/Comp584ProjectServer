@@ -8,5 +8,7 @@ namespace Comp584ProjectServer.Repositories.Interface
         Task AddRangeAsync(IEnumerable<Book> books);
 
         Task<Book?> GetById(Guid id);
+        Task<Book?> GetByUrlHandleAsync(string urlHandle);
+        Task<int> GetCountAsync();
     }
 }

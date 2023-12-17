@@ -29,5 +29,15 @@ namespace Comp584ProjectServer.Repositories.Implementation
         {
            return await dbContext.Books.FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<int> GetCountAsync()
+        {
+            return await dbContext.Books.CountAsync();
+        }
+
+        public async Task<Book?> GetByUrlHandleAsync(string urlHandle)
+        {
+            return await dbContext.Books.FirstOrDefaultAsync(x => x.UrlHandle == urlHandle);
+        }
     }
 }

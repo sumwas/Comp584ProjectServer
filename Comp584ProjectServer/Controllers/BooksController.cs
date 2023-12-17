@@ -1,4 +1,5 @@
 ﻿using Comp584ProjectServer.Models.DTO;
+using Comp584ProjectServer.Repositories.Implementation;
 using Comp584ProjectServer.Repositories.Interface;
 using Comp584ProjectServer.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -15,13 +16,14 @@ namespace Comp584ProjectServer.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookRepository bookRepository;
+        private readonly IReviewRepository reviewRepository;
 
-        public BooksController(IBookRepository bookRepository)
+        public BooksController(IBookRepository bookRepository, IReviewRepository reviewRepository)
         {
             this.bookRepository = bookRepository;
+            this.reviewRepository = reviewRepository;
         }
 
-        //[Authorize(Roles = "RegisteredUser")]
         [HttpGet]
         public async Task<IActionResult> GetBooks()
         {
@@ -46,7 +48,6 @@ namespace Comp584ProjectServer.Controllers
             return Ok(response);
         }
 
-        //[Authorize(Roles = "RegisteredUser")]
         [HttpGet]
         [Route("{id:Guid}")]
         public async Task<IActionResult> GetBookbyID([FromRoute] Guid id)
@@ -71,23 +72,67 @@ namespace Comp584ProjectServer.Controllers
             return Ok(response);
         }
 
+        [HttpGet]
+        [Route("{id:Guid}/reviews")]
+        public async Task<IActionResult> GetReviewsForBook([FromRoute] Guid id)
+        {
+            var reviews = await reviewRepository.GetReviewsForBook(id);
+
+            return Ok(reviews);
+        }
+
+        [HttpGet]
+        [Route("{urlHandle}")]
+        public async Task<IActionResult> GetBookByUrlHandle([FromRoute] string urlHandle)
+        {
+            var existingBook = await bookRepository.GetByUrlHandleAsync(urlHandle);
+
+            if (existingBook == null)
+            {
+                return NotFound();
+            }
+
+            var response = new BookDTO
+            {
+                Id = existingBook.Id,
+                Title = existingBook.Title,
+                Author = existingBook.Author,
+                PlotSummary = existingBook.PlotSummary,
+                PublicationDate = existingBook.PublicationDate,
+                UrlHandle = existingBook.UrlHandle,
+            };
+
+            return Ok(response);
+
+        }
+
 
         [HttpPost("populate")]
         public async Task<IActionResult> PopulateBooks()
         {
             try
             {
-                string filePath = "Data/booksummaries.txt";
-                var books = BookService.ReadBooksFromFile(filePath);
+                // Check if the Books table is empty
+                if (await bookRepository.GetCountAsync() == 0)
+                {
+                    string filePath = "Data/booksummaries.txt";
+                    var books = BookService.ReadBooksFromFile(filePath);
 
-                await bookRepository.AddRangeAsync(books);
+                    await bookRepository.AddRangeAsync(books);
 
-                return Ok("Books populated successfully.");
+                    return Ok("Books populated successfully.");
+                }
+                else
+                {
+                    return Ok("Books table is not empty. No need to populate.");
+                }
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
+
     }
 }

@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Comp584ProjectServer.Migrations
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
+namespace Comp584ProjectServer.Migrations.AuthDb
 {
     /// <inheritdoc />
-    public partial class Identity : Migration
+    public partial class InitialMigrationForAuth : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -154,6 +156,29 @@ namespace Comp584ProjectServer.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "9b8aef04-21d0-4af2-9e62-967450546a11", "9b8aef04-21d0-4af2-9e62-967450546a11", "Reader", "READER" },
+                    { "d15bf474-169f-4f06-ab4b-90c4fa8dc109", "d15bf474-169f-4f06-ab4b-90c4fa8dc109", "Writer", "WRITER" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "512d3dbc-9fbb-4f6d-ba58-b3050794b732", 0, "2c201ef9-a91f-4e12-a276-7659d7ef96e9", "admin@email.com", false, false, null, "ADMIN@EMAIL.COM", "ADMIN@EMAIL.COM", "AQAAAAIAAYagAAAAEMTjx1BmgciM2sqy8OACJCaM5RMTi0/pyDqyQiYkzuX3YBgLpUNuChWiZnxr3aWvKA==", null, false, "d70d5758-e399-4e93-b4eb-5f4a34a249c2", false, "admin@email.com" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { "9b8aef04-21d0-4af2-9e62-967450546a11", "512d3dbc-9fbb-4f6d-ba58-b3050794b732" },
+                    { "d15bf474-169f-4f06-ab4b-90c4fa8dc109", "512d3dbc-9fbb-4f6d-ba58-b3050794b732" }
                 });
 
             migrationBuilder.CreateIndex(
